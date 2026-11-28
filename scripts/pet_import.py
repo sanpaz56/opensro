@@ -515,10 +515,9 @@ def _manifest_with(output, manifest_name, shard):
 #
 # Name text for the imported kinds: rows the later object table carries
 # under the kinds' name keys, appended to the staging name table where
-# the native one lacks them. A key with no row of its own but a row
-# under the key with its doubled underscores single takes that row's
-# text (NAME_KEY_TYPOS; reported as nameTextTypos). Missing keys are
-# reported, not fatal (a kind whose name never arrived is still listed
+# the native one lacks them. A key NAME_KEY_TYPOS lists, with no row of
+# its own, takes the row of the key the table maps it to (reported as
+# nameTextTypos). Missing keys are reported, not fatal (a kind whose name never arrived is still listed
 # for the follow-up).
 # ================
 def _merge_name_text(output, char_rows, item_rows, later_text, report):

@@ -513,7 +513,7 @@ class ArchiveTests(unittest.TestCase):
 		# Only a typo NAME_KEY_TYPOS names is healed: any other gap still
 		# reaches the title check, which stops publication on it.
 		report, by_key = self._typo_import("ITEM_PET_DOG", "ITEM_PET__DOG")
-		self.assertIn("SN_ITEM_PET__DOG", str(report["missingNameText"]))
+		self.assertIn("SN_ITEM_PET__DOG", report["missingNameText"])
 		self.assertNotIn("nameTextTypos", report)
 		self.assertNotIn("SN_ITEM_PET__DOG", by_key)
 
