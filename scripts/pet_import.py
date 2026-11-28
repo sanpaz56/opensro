@@ -121,11 +121,13 @@ INFERRED_SOURCE = {"name": "inferred", "char_shard": "characterdata_340000.txt",
 	"skill_shard": "skilldata_340000.txt", "report": ".opensro-pets-inferred.json", "pins": None, "infer": True}
 SOURCES = (VSRO_SOURCE, V1696_SOURCE, ARCHIVE_SOURCE, INFERRED_SOURCE)
 
-# v1.696 names its Dark Griffin event scroll SN_ITEM_PET2_SCROLL_ASS__GRYPHON_A
-# and ships no text under it; every other event scroll shares its twin's
-# key, here SN_ITEM_PET2_SCROLL_ASS_GRYPHON_A. Inferred: the doubled
-# underscore is a source typo, so the single-underscore row is its title.
-TYPO_UNDERSCORES = re.compile(r"_{2,}")
+# Name keys a later source spells with a typo and ships no text under,
+# each mapped to the key whose row is its title. v1.696 names its Dark
+# Griffin event scroll SN_ITEM_PET2_SCROLL_ASS__GRYPHON_A; every other event
+# scroll shares its twin's key, here SN_ITEM_PET2_SCROLL_ASS_GRYPHON_A.
+# Inferred: the doubled underscore is a source typo. The table names each
+# typo, so a new one still stops the title check instead of being healed.
+NAME_KEY_TYPOS = {"SN_ITEM_PET2_SCROLL_ASS__GRYPHON_A": "SN_ITEM_PET2_SCROLL_ASS_GRYPHON_A"}
 EXCLUDED_PREFIXES = ("COS_GUARD_", "COS_GUILD_")
 # A developer's test row (v1.696 COS_T_BEHEMOTH_TEST: no scroll, a copy
 # of the Behemoth) is no kind at all (mall_avatar_import's _TEST rule).
@@ -515,7 +517,7 @@ def _manifest_with(output, manifest_name, shard):
 # under the kinds' name keys, appended to the staging name table where
 # the native one lacks them. A key with no row of its own but a row
 # under the key with its doubled underscores single takes that row's
-# text (TYPO_UNDERSCORES; reported as nameTextTypos). Missing keys are
+# text (NAME_KEY_TYPOS; reported as nameTextTypos). Missing keys are
 # reported, not fatal (a kind whose name never arrived is still listed
 # for the follow-up).
 # ================
@@ -533,8 +535,8 @@ def _merge_name_text(output, char_rows, item_rows, later_text, report):
 		if len(row) >= 10]
 	texts = [row for row in later if row[1] in wanted]
 	later = {row[1]: row for row in reversed(later)}
-	typos = {key: TYPO_UNDERSCORES.sub("_", key) for key in sorted(wanted - later.keys())}
-	typos = {key: single for key, single in typos.items() if single != key and single in later}
+	typos = {key: NAME_KEY_TYPOS[key] for key in sorted(wanted - later.keys())
+		if NAME_KEY_TYPOS.get(key) in later}
 	texts += [[later[single][0], key, *later[single][2:]] for key, single in typos.items()]
 	if texts:
 		write_atomically(name_path, characters.append_rows(base, texts))
